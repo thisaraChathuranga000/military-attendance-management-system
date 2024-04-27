@@ -4,7 +4,7 @@ import { Attendance } from './Attendance.entity';
 @Entity({ name: 'users'})
 export class User {
     @PrimaryGeneratedColumn({ type: 'bigint' })
-    userId:number;
+    id:number;
 
     @Column()
     userName: string;
@@ -23,7 +23,4 @@ export class User {
 
     @Column()
     platoon: string;
-
-    @OneToMany(() => Attendance, attendance => attendance.user)
-    attendances: Attendance[];
 }

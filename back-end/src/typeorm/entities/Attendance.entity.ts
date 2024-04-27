@@ -12,12 +12,12 @@ export class Attendance {
     @Column({default: false})
     notOnPerad: boolean;
 
-    @Column()
-    absent : number;
+    @Column({default: false})
+    absent : boolean;
 
     @Column()
-    date: Date;
+    date: String;
 
-    @ManyToOne(() => User, user => user.attendances)
-    user: User;
+    @Column()
+    userId: number;
 }
