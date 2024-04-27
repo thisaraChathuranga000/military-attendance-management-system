@@ -7,11 +7,4 @@ export class CreateUserDto {
     readonly platoon: string;
 }
 
-export class UpdateUserDto {
-    readonly userName?: string;
-    readonly password?: string;
-    readonly svcNo?: string;
-    readonly name?: string;
-    readonly intake?: string;
-    readonly platoon?: string;
-}
+ 
