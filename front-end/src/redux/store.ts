@@ -1,10 +1,12 @@
 import {Action, ThunkAction, combineReducers, configureStore} from "@reduxjs/toolkit"
 import dateReducer from "./slice/dateSlice"
 import authReducer from "./slice/authSlice"
+import userReducer from "./slice/userSlice"
  
 const rootReducer = combineReducers({
     date : dateReducer,
-    auth : authReducer
+    auth : authReducer,
+    user : userReducer
 })
 
 export const store = configureStore({

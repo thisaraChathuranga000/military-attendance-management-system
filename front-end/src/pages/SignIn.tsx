@@ -4,6 +4,7 @@ import { login } from '../redux/slice/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { UserData } from '../interfaces/User';
 import { UUO, DutyOfficer, UDC, NoUser } from '../data/User';
+import { setSelectedUserData } from '../redux/slice/userSlice';
 
 function SignIn() {
   const dispatch = useDispatch();
@@ -48,6 +49,8 @@ function SignIn() {
   const handleSignIn = () => {
     switch (selectedRank) {
       case 'Soldier':
+        const user:any = userData.find((user) => user.userName === username && user.password === password);
+        dispatch(setSelectedUserData(user));
         handleLogin(userData, '/soldiar');
         break;
       case 'UUO':
