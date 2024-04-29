@@ -27,4 +27,12 @@ export class UsersService {
     async findAll(): Promise<User[]> {
         return await this.userRepository.find();
     }
+
+    async getUserIdBySvcNoPlatoonAndIntake(svcNo: string, platoon: string, intake: string): Promise<number | null> {
+        const user = await this.userRepository.findOne({
+          where: { svcNo, platoon, intake },
+          select: ['id']
+        });
+        return user ? user.id : null;
+    }
 }

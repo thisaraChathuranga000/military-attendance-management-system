@@ -21,4 +21,13 @@ export class UsersController {
     async findAll(): Promise<User[]> {
         return await this.usersService.findAll();
     }
+
+    @Get(':svcNo/:platoon/:intake')
+    async getUserIdBySvcNoPlatoonAndIntake(
+      @Param('svcNo') svcNo: string,
+      @Param('platoon') platoon: string,
+      @Param('intake') intake: string,
+    ): Promise<number | null> {
+      return this.usersService.getUserIdBySvcNoPlatoonAndIntake(svcNo, platoon, intake);
+    }
 }

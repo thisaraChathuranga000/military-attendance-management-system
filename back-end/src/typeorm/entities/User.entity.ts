@@ -12,7 +12,7 @@ export class User {
     @Column()
     password: string;
 
-    @Column()
+    @Column({unique: true})
     svcNo: string;
 
     @Column()
