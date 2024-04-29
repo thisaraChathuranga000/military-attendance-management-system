@@ -25,10 +25,6 @@ function App() {
       </Routes>
       : <SignIn />
       }
-
-      
-
-      
     </div>
   );
 }

@@ -11,8 +11,8 @@ function SignIn() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<UserData[]>([]);
   const [selectedRank, setSelectedRank] = useState<string>('Soldier');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
