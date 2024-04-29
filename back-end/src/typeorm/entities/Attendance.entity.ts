@@ -15,6 +15,9 @@ export class Attendance {
     @Column({default: false})
     absent : boolean;
 
+    @Column({default: ""})
+    reason: String;
+
     @Column()
     date: String;
 
