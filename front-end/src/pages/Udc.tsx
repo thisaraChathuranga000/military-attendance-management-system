@@ -7,7 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { FormControl,  FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent } from '@mui/material';
+import { Box, Button, FormControl,  FormControlLabel, FormHelperText, FormLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, TextField } from '@mui/material';
 
 function Udc() {
   const selectedDate = useSelector((state: RootState) => state.date.selectedDate);
@@ -102,28 +102,91 @@ function Udc() {
     fetchUserId(formData.svcNo,formData.platoon, formData.intake);
   }, [selectedDate, formData.svcNo,formData.platoon, formData.intake]);
 
-  const handleChange = (e: SelectChangeEvent | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: SelectChangeEvent | React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setReason(e.target.value);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
+
+  const handleLogOut = () => {
+    window.location.replace('http://localhost:3000/sign-in')
+  };
   
   return (
     <div>
-        <h3>Rank : UDC</h3>
-        <button>Logout</button><br />
+          <Box>
+                <Grid container sx={{backgroundColor:"#C68D4D"}}>
+                    <Grid  item lg={6} md={6} xs={12} container sx={{pl:10, pt:5, pb:5, display:"flex", flexDirection:"column" }}>
+                        <div style={{color:"#FFD9AF", display:"flex", flexDirection:"row", alignItems:"center"}}>
+                            <img src="assets/images/largeLogo.png" alt="" width="100px" style={{paddingRight:25}}/>
+                            <div style={{display:"flex", flexDirection:"column"}}>
+                                <h2 style={{fontSize:"30px",margin: "0"  }}>Military Connect</h2>
+                                <p style={{margin: "0", fontSize:"20px" }}>Attendance System for Military Users</p>
+                            </div>
+                        </div>
+                    </Grid>
 
-        <input type="date" id="datePicker" value={selectedDate} onChange={handleDateChange}/>
-        <br />
+                    <Grid  item lg={6} md={6} xs={12} container sx={{pr:10, pt:5,  display:"flex", flexDirection:"column", backgroundImage: "url('assets/images/pattern.png')", color:"white",alignContent:"flex-end"}}>
+                        <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
+                            <img src="assets/images/Avatar.png" alt="" width="50px" style={{paddingRight:15}}/>
+                            <div style={{display:"flex", flexDirection:"column", paddingRight:15}}>
+                            <p style={{margin:"0"}}>Rank : Udc</p>
+                            </div>
+                            <img src="assets/images/Icon.png" alt="" width="20px" onClick={handleLogOut}/>
+                        </div>
+                    </Grid>
+                </Grid>
+          </Box>
 
-        <button onClick={handleClickOpen}>update</button>
+          <Box sx={{py:6, pl:6, pr:6}}>
+            <Grid container spacing={0}>
+              <Grid item lg={6} xs={6} md={6}>
+                  <div>
+                    <p style={{fontSize:"20px", fontWeight:"600", margin:"0"}}>Parade Count</p>
+                    <p style={{fontWeight:"400", marginTop:"5px"}}>Summary View of Parade Participants</p>
+                  </div>
+              </Grid>
 
-        <p>Total count: {attendanceStats.total}</p>
-        <p>on perad count: {attendanceStats.onPerad}</p>
-        <p>Not on perad count: {attendanceStats.notOnPerad}</p>
-        <p>Absent count: {attendanceStats.absent}</p>
+              <Grid item lg={6} xs={6} md={6} container direction="row" justifyContent="flex-end" alignItems="center">
+                  <Button variant="contained" sx={{maxWidth:350, backgroundColor:"#C68D4D", alignContent:"flex-end"}} onClick={handleClickOpen}>
+                    update
+                  </Button>
+              </Grid>
+            </Grid>
+             
+
+            <input type="date" id="datePicker" value={selectedDate} onChange={handleDateChange} style={{ padding:5, border:"1px solid #C68D4D", borderRadius:"5px", marginBottom:30}} />
+
+            <Grid container spacing={0}>
+              <Grid item lg={3} xs={6} md={8} sx={{backgroundColor:"#DAC0A3"}}>
+                <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
+                  <p style={{paddingLeft:"25px", fontWeight:"500"}}>Total <br/>Participants</p>  
+                  <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.total}</h1>               
+                </div>
+              </Grid>
+              <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#EADBC8"}}>
+                <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
+                  <p style={{paddingLeft:"25px", fontWeight:"500"}}>On Parade <br/>Participants</p>  
+                  <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.onPerad}</h1>               
+                </div>
+              </Grid>
+              <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#DAC0A3"}}>
+                <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
+                  <p style={{paddingLeft:"25px", fontWeight:"500"}}>Not on Parade<br/>Participants</p>  
+                  <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.notOnPerad}</h1>               
+                </div>
+              </Grid>
+              <Grid item lg={3} xs={6} md={8} sx={{backgroundColor:"#EADBC8"}}>
+                <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
+                  <p style={{paddingLeft:"25px", fontWeight:"500"}}>Non Responded <br/>Participants</p>  
+                  <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.absent}</h1>               
+                </div>
+              </Grid>
+            </Grid>
+          </Box>
+
 
         <Dialog
           open={open}
@@ -131,7 +194,88 @@ function Udc() {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-              <h2>Update count</h2>
+          <Box sx={{minWidth:800, py:4, pl:4}}>
+              <div style={{marginBottom:"20px"}}>
+                <p style={{fontSize:"20px", fontWeight:"600", margin:"0"}}>Update Participation</p>
+              </div>
+
+              <div style={{display:"flex", flexDirection:"column"}}>
+                <p style={{fontWeight:"500"}}>SVC</p>
+                <TextField fullWidth label="Enter SVC number" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"10px"}} name="svcNo" onChange={handleChange}/>
+
+                <p style={{fontWeight:"500"}}>Platoon</p>
+                <FormControl sx={{ maxWidth:350, marginBottom:"10px" }}>
+                  <Select
+                    displayEmpty
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    onChange={handleChange}
+                    name="platoon"
+                  >
+                    <MenuItem defaultValue={"Alpha"}>Alpha</MenuItem>
+                    <MenuItem value={"Beta"}>Beta</MenuItem>
+                    <MenuItem value={"Cobra"}>Cobra</MenuItem>
+                    <MenuItem value={"Delta"}>Delta</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <p style={{fontWeight:"500"}}>Intake</p>
+                <TextField fullWidth label="Enter Intake" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"20px"}} name="intake" onChange={handleChange}/>
+
+                <div style={{display:"flex", flexDirection:"column"}}>
+                    <div style={{marginRight:"200px", marginBottom:"10px"}}>
+                        <p style={{fontWeight:"600", margin:"0"}}>Parade Participation *</p>
+                    </div>
+
+                    <div style={{display:"flex", flexDirection:"column"}}>
+                    <FormControl sx={{marginBottom:2}}>
+                        <RadioGroup
+                            aria-labelledby="demo-radio-buttons-group-label"
+                            defaultValue="OnParade"
+                            name="radio-buttons-group"
+                            onChange={handleRadioChange}
+                        >
+                            <FormControlLabel value="OnParade" control={<Radio />} label="Participated" />
+                            <FormControlLabel value="NotOnParade" control={<Radio />} label="Not participated" />
+                        </RadioGroup>
+                    </FormControl>
+
+                    {showSelect && (
+                        <FormControl sx={{marginBottom:2}}>
+                            <InputLabel id="demo-pselect-small-label">Reason</InputLabel>
+                            <Select
+                                labelId="demo-select-small-label"
+                                id="demo-select-small"
+                                value={reason}
+                                label="Reason"
+                                onChange={handleChange}
+                                sx={{ maxWidth:450 }}
+                            >
+                                <MenuItem value={'New report Sick'}>New report Sick</MenuItem>                   
+                                <MenuItem value={'Report Sick'}>Report Sick</MenuItem>
+                                <MenuItem value={'EX PT/EX PARADE'}>EX PT/EX PARADE</MenuItem>
+                                <MenuItem value={'Hospital'}>Hospital</MenuItem>
+                                <MenuItem value={'M1 Room'}>M1 Room</MenuItem>
+                                <MenuItem value={'SD/LD'}>SD/LD</MenuItem>
+                                <MenuItem value={'Leave'}>Leave</MenuItem>
+                                <MenuItem value={'Medicle Leave'}>Medicle Leave</MenuItem>
+                                <MenuItem value={'Workout'}>Workout</MenuItem>
+                                <MenuItem value={'Theory/Practicle'}>Theory/Practicle</MenuItem>
+                                <MenuItem value={'Sports'}>Sports</MenuItem>
+                                <MenuItem value={'Other'}>Other</MenuItem>
+                            </Select>
+                        </FormControl>
+                    )}
+
+                    <Button variant="contained" sx={{maxWidth:150, backgroundColor:"#C68D4D"}} onClick={handleSubmit}>
+                        Submit
+                    </Button>
+                    </div>
+                </div>
+              </div>
+          </Box>
+
+
+              {/* <h2>Update count</h2>
               <input type="text" placeholder='svc no' name="svcNo" onChange={handleChange} /><br />
               <label>Platoon</label>
               <select id="platoon" name="platoon" onChange={handleChange}>
@@ -183,7 +327,7 @@ function Udc() {
                   </FormControl>
                 )}
               <br/>
-              <button onClick={handleSubmit}>submit</button>
+              <button onClick={handleSubmit}>submit</button> */}
         </Dialog>
     </div>
   )
