@@ -11,15 +11,46 @@ function SignUp() {
     platoon: 'Alpha'
   });
 
+  const [errors, setErrors] = useState({
+    userName: false,
+    password: false,
+    svcNo: false,
+    name: false,
+    intake: false,
+    platoon: false 
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement| HTMLTextAreaElement> | SelectChangeEvent) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+
+    setErrors({
+      ...errors,
+      [e.target.name]: false
+    });
   };
 
   const handleSubmit = async (e:any) => {
     e.preventDefault()
+
+    const formIsValid = Object.values(formData).every(value => value.trim() !== '');
+    
+    if (!formIsValid) {
+       
+      setErrors({
+        userName: formData.userName.trim() === '',
+        password: formData.password.trim() === '',
+        svcNo: formData.svcNo.trim() === '',
+        name: formData.name.trim() === '',
+        intake: formData.intake.trim() === '',
+        platoon: formData.platoon.trim() === ''
+        
+      });
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:5000/users', {
         method: 'POST',
@@ -62,21 +93,26 @@ function SignUp() {
 
           <div style={{display:"flex", flexDirection:"column"}}>
             <label style={{marginBottom:"15px"}}>User Name</label>
-            <TextField fullWidth label="Enter your user name" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"20px"}} name="userName" onChange={handleChange}  />
+            <TextField fullWidth label="Enter your user name" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"20px"}} name="userName" onChange={handleChange} />
+            {errors.userName && <p style={{ color: 'red' }}>Username is required</p>}
 
             <label style={{marginBottom:"15px"}}>Password</label>
             <TextField fullWidth label="Enter your Password" id="fullWidth" sx={{maxWidth:350, marginBottom:"20px"}} name="password" onChange={handleChange}  />
+            {errors.password && <p style={{ color: 'red' }}>Password is required</p>}
 
             <label style={{marginBottom:"15px"}}>Name</label>
             <TextField fullWidth label="Enter your name here" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"20px"}} name="name" onChange={handleChange}  />
+            {errors.name && <p style={{ color: 'red' }}>Name is required</p>}
 
             <label style={{marginBottom:"15px"}}>SVC</label>
             <TextField fullWidth label="Enter your svc no here" id="fullWidth" sx={{maxWidth:350, marginBottom:"20px"}} name="svcNo" onChange={handleChange}   />
+            {errors.svcNo && <p style={{ color: 'red' }}>Svc number is required</p>}
 
             <label style={{marginBottom:"15px"}}>Intake</label>
             <TextField fullWidth label="Enter your intake here" id="fullWidth" sx={{maxWidth:350, marginBottom:"20px"}} name="intake" onChange={handleChange}   />
+            {errors.intake && <p style={{ color: 'red' }}>Intake is required</p>}
 
-            <label style={{marginBottom:"15px"}}>Rank</label>
+            <label style={{marginBottom:"15px"}}>Platoon</label>
             <FormControl sx={{ maxWidth:350, marginBottom:"20px" }}>
               <Select
                 displayEmpty
@@ -89,7 +125,9 @@ function SignUp() {
                 <MenuItem value={"Cobra"}>Cobra</MenuItem>
                 <MenuItem value={"Delta"}>Delta</MenuItem>
               </Select>
+              {errors.platoon && <p style={{ color: 'red' }}>Platoon is required</p>}
             </FormControl>
+             
 
             <Button variant="contained" sx={{maxWidth:350, backgroundColor:"#C68D4D"}} onClick={handleSubmit}>
               Sign up
