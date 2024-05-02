@@ -59,6 +59,8 @@ function Soldier() {
         } catch (error) {
             console.error('Error submitting attendance:', error);
         }
+
+        
     };
 
     const handleLogOut = () => {

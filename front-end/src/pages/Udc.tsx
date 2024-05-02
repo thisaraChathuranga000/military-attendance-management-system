@@ -3,11 +3,7 @@ import { RootState } from '../redux/store';
 import { setSelectedDate } from '../redux/slice/dateSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import { Box, Button, FormControl,  FormControlLabel, FormHelperText, FormLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, TextField } from '@mui/material';
+import { Box, Button, FormControl,  FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, TextField } from '@mui/material';
 
 function Udc() {
   const selectedDate = useSelector((state: RootState) => state.date.selectedDate);
@@ -43,6 +39,10 @@ function Udc() {
     const value = event.target.value === 'OnParade';
     setOnParade(value);
     setShowSelect(!value);
+
+    if (value) {
+      setReason('');
+    }
   };
 
   const fetchData = async (date: string) => {
@@ -103,7 +103,6 @@ function Udc() {
   }, [selectedDate, formData.svcNo,formData.platoon, formData.intake]);
 
   const handleChange = (e: SelectChangeEvent | React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setReason(e.target.value);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -113,6 +112,11 @@ function Udc() {
   const handleLogOut = () => {
     window.location.replace('http://localhost:3000/sign-in')
   };
+
+  const handleReasonChange = (event: SelectChangeEvent) => {
+    setReason(event.target.value);
+};
+
   
   return (
     <div>
@@ -247,7 +251,7 @@ function Udc() {
                                 id="demo-select-small"
                                 value={reason}
                                 label="Reason"
-                                onChange={handleChange}
+                                onChange={handleReasonChange}
                                 sx={{ maxWidth:450 }}
                             >
                                 <MenuItem value={'New report Sick'}>New report Sick</MenuItem>                   
@@ -273,68 +277,10 @@ function Udc() {
                 </div>
               </div>
           </Box>
-
-
-              {/* <h2>Update count</h2>
-              <input type="text" placeholder='svc no' name="svcNo" onChange={handleChange} /><br />
-              <label>Platoon</label>
-              <select id="platoon" name="platoon" onChange={handleChange}>
-                <option value="Alpha">Alpha</option>
-                <option value="Beta">Beta</option>
-                <option value="Cobra">Cobra</option>
-                <option value="Delta">Delta</option>
-              </select><br />
-              <input type="text" placeholder='intake' name="intake" onChange={handleChange}/>
-               
-
-              <FormControl>
-                  <FormLabel id="demo-radio-buttons-group-label">Parade Participation</FormLabel>
-                  <RadioGroup
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="OnParade"
-                      name="radio-buttons-group"
-                      onChange={handleRadioChange}
-                  >
-                      <FormControlLabel value="OnParade" control={<Radio />} label="Yes, I have participated" />
-                      <FormControlLabel value="NotOnParade" control={<Radio />} label="No, I was unable to participate" /> 
-                  </RadioGroup>
-              </FormControl>
-
-              {showSelect && (
-                  <FormControl>
-                      <InputLabel id="demo-pselect-small-label">Reason</InputLabel>
-                      <Select
-                          labelId="demo-select-small-label"
-                          id="demo-select-small"
-                          value={reason}
-                          label="Reason"
-                          onChange={handleChange}
-                          sx={{ width: "100px" }}
-                      >
-                          <MenuItem value={'New report Sick'}>New report Sick</MenuItem>                   
-                          <MenuItem value={'Report Sick'}>Report Sick</MenuItem>
-                          <MenuItem value={'EX PT/EX PARADE'}>EX PT/EX PARADE</MenuItem>
-                          <MenuItem value={'Hospital'}>Hospital</MenuItem>
-                          <MenuItem value={'M1 Room'}>M1 Room</MenuItem>
-                          <MenuItem value={'SD/LD'}>SD/LD</MenuItem>
-                          <MenuItem value={'Leave'}>Leave</MenuItem>
-                          <MenuItem value={'Medicle Leave'}>Medicle Leave</MenuItem>
-                          <MenuItem value={'Workout'}>Workout</MenuItem>
-                          <MenuItem value={'Theory/Practicle'}>Theory/Practicle</MenuItem>
-                          <MenuItem value={'Sports'}>Sports</MenuItem>
-                          <MenuItem value={'Other'}>Other</MenuItem>
-                      </Select>
-                  </FormControl>
-                )}
-              <br/>
-              <button onClick={handleSubmit}>submit</button> */}
         </Dialog>
     </div>
   )
 }
 
 export default Udc
-
- 
-
  
