@@ -1,17 +1,20 @@
 import { Injectable, NotFoundException, Param } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Attendance } from "src/typeorm/entities/Attendance.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { CreateAttendanceDto } from "./dto/attendance.dto";
+import { User } from "src/typeorm/entities/User.entity";
 
 @Injectable()
 export class AttendanceService {
     constructor(
         @InjectRepository(Attendance)
         private readonly attendanceRepository: Repository<Attendance>,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
     ) {}
 
-    async createUser(createAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
+    async createAttendance(createAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
         const user = this.attendanceRepository.create(createAttendanceDto);
         return await this.attendanceRepository.save(user);
     }
@@ -50,5 +53,88 @@ export class AttendanceService {
           total: total 
         };
         return stats;
-      }
+    }
+
+    async getAttendedUsers(date: string): Promise<{ userName: string; svcNo: string }[]> {
+        const attendedUserIds = (
+          await this.attendanceRepository.find({
+            where: { onPerad: true, date },
+            select: ['userId'],
+          })
+        ).map(att => att.userId);
+    
+        const attendedUsers = await this.userRepository.find({
+          where: { id: In(attendedUserIds) },
+          select: ['userName', 'svcNo'],
+        });
+    
+        return attendedUsers;
+    }
+
+    async getNotAttendedUsers(date: string): Promise<{ userName: string; svcNo: string;  }[]> {
+        const notAttendedUserIds = (
+          await this.attendanceRepository.find({
+            where: { notOnPerad: true, date },
+            select: ['userId'],
+          })
+        ).map(att => att.userId);
+    
+        const notAttendedUsers = await this.userRepository.find({
+          where: { id: In(notAttendedUserIds) },
+          select: ['userName', 'svcNo'],
+        });
+
+        return notAttendedUsers;
+
+    }
+
+    async getNotAttendedUsersReason(date: string): Promise<{ userId: number; reason: String }[]> {
+      const notAttendedUsers = await this.attendanceRepository.find({
+        where: { notOnPerad: true, date },
+        select: ['userId', 'reason'],
+      });
+  
+      return notAttendedUsers.map(({ userId, reason }) => ({ userId, reason }));
+    }
+
+    async getAbsentAttendedUsers(date: string): Promise<{ userName: string; svcNo: string }[]> {
+      const absentAttendedUserIds = (
+        await this.attendanceRepository.find({
+          where: { onPerad: true, absent: true, date },
+          select: ['userId'],
+        })
+      ).map(att => att.userId);
+  
+      const absentAttendedUsers = await this.userRepository.find({
+        where: { id: In(absentAttendedUserIds) },
+        select: ['userName', 'svcNo'],
+      });
+  
+      return absentAttendedUsers;
+  }
+
+  async getAbsentNotAttendedUsers(date: string): Promise<{ userName: string; svcNo: string }[]> {
+    const absentNotAttendedUserIds = (
+      await this.attendanceRepository.find({
+        where: { notOnPerad: true, absent: true, date },
+        select: ['userId'],
+      })
+    ).map(att => att.userId);
+
+    const absentNotAttendedUsers = await this.userRepository.find({
+      where: { id: In(absentNotAttendedUserIds) },
+      select: ['userName', 'svcNo'],
+    });
+
+    return absentNotAttendedUsers;
+  }
+
+  async getAbsentNotAttendedUsersReason(date: string): Promise<{ userId: number; reason: String }[]> {
+    const absentNotAttendedUsersReason = await this.attendanceRepository.find({
+      where: { notOnPerad: true, absent: true, date },
+      select: ['userId', 'reason'],
+    });
+
+    return absentNotAttendedUsersReason.map(({ userId, reason }) => ({ userId, reason }));
+  }
 }
