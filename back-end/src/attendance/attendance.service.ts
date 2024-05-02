@@ -65,7 +65,7 @@ export class AttendanceService {
     
         const attendedUsers = await this.userRepository.find({
           where: { id: In(attendedUserIds) },
-          select: ['userName', 'svcNo'],
+          select: ['name', 'svcNo'],
         });
     
         return attendedUsers;
@@ -81,7 +81,7 @@ export class AttendanceService {
     
         const notAttendedUsers = await this.userRepository.find({
           where: { id: In(notAttendedUserIds) },
-          select: ['userName', 'svcNo'],
+          select: ['name', 'svcNo'],
         });
 
         return notAttendedUsers;
@@ -107,7 +107,7 @@ export class AttendanceService {
   
       const absentAttendedUsers = await this.userRepository.find({
         where: { id: In(absentAttendedUserIds) },
-        select: ['userName', 'svcNo'],
+        select: ['name', 'svcNo'],
       });
   
       return absentAttendedUsers;
@@ -123,7 +123,7 @@ export class AttendanceService {
 
     const absentNotAttendedUsers = await this.userRepository.find({
       where: { id: In(absentNotAttendedUserIds) },
-      select: ['userName', 'svcNo'],
+      select: ['name', 'svcNo'],
     });
 
     return absentNotAttendedUsers;
