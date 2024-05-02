@@ -4,6 +4,8 @@ import { setSelectedDate } from '../redux/slice/dateSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
 import { Box, Button, FormControl,  FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, TextField } from '@mui/material';
+import ParticipantTable from '../component/ParticipantTable';
+import { listProps } from '../component/ParticipantTable';
 
 function Udc() {
   const selectedDate = useSelector((state: RootState) => state.date.selectedDate);
@@ -13,6 +15,26 @@ function Udc() {
   const [reason, setReason] = useState<string>('');
   const [selectedUserId, setSelectedUserId] = useState<number>(0);
   const [onParade, setOnParade] = useState<boolean>(true);
+
+  const [openOnParadeList, setOpenOnParadeList] = useState<boolean>(false);
+  const [showOnParade, setShowOnParade] = useState<boolean>(false);
+  const [openNotOnParadeList, setOpenNotOnParadeList] = useState<boolean>(false);
+  const [showNotOnParade, setShowNotOnParade] = useState<boolean>(false);
+  const [attendedUsers, setAttendedUsers] = useState<listProps[]>([]);
+  const [notAttendedUsers, setNotAttendedUsers] = useState<listProps[]>([]);
+  const [notAttendedReasons, setNotAttendedReasons] = useState<any[]>([]);
+
+  const handleClickOpenOnParadeList = () => {
+    setOpenOnParadeList(true);
+    setShowOnParade(true);
+  };
+  const handleCloseOnParadeList = () => {setOpenOnParadeList(false)};
+
+  const handleClickOpenNotOnParadeList = () => {
+    setOpenNotOnParadeList(true);
+    setShowNotOnParade(true);
+  }
+  const handleCloseNotOnParadeList = () => {setOpenNotOnParadeList(false)};
 
   const [formData, setFormData] = useState({
     svcNo: '',
@@ -97,9 +119,49 @@ function Udc() {
     }
   };
 
+  const fetchAttendedUserData = async (date:string) => {
+    try {
+        const response = await fetch(`http://localhost:5000/attendance/attended-users/${date}`);
+        if (response.ok) {
+            const data = await response.json();
+            setAttendedUsers(data);
+        } else {
+            console.error('Failed to fetch attended users data');
+        }
+    } catch (error) {
+        console.error('Error fetching attended users data:', error);
+    }
+  };
+
+  const fetchNotAttendedUserData = async (date:string) => {
+    try {
+        const usersResponse = await fetch(`http://localhost:5000/attendance/not-attended-users/${date}`);
+        if (usersResponse.ok) {
+            const usersData = await usersResponse.json();
+            setNotAttendedUsers(usersData);
+        } else {
+            console.error('Failed to fetch not attended users data');
+        }
+
+        const reasonsResponse = await fetch(`http://localhost:5000/attendance/not-attended-users/reason/${date}`);
+        if (reasonsResponse.ok) {
+            const reasonsData = await reasonsResponse.json();
+            setNotAttendedReasons(reasonsData);
+        } else {
+            console.error('Failed to fetch not attended reasons data');
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+  };
+
+
+
   useEffect(() => {
     fetchData(selectedDate);
     fetchUserId(formData.svcNo,formData.platoon, formData.intake);
+    fetchAttendedUserData(selectedDate)
+    fetchNotAttendedUserData(selectedDate)
   }, [selectedDate, formData.svcNo,formData.platoon, formData.intake]);
 
   const handleChange = (e: SelectChangeEvent | React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -115,7 +177,7 @@ function Udc() {
 
   const handleReasonChange = (event: SelectChangeEvent) => {
     setReason(event.target.value);
-};
+  };
 
   
   return (
@@ -170,14 +232,14 @@ function Udc() {
                   <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.total}</h1>               
                 </div>
               </Grid>
-              <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#EADBC8"}}>
+              <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#EADBC8"}} onClick={handleClickOpenOnParadeList}>
                 <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
                   <p style={{paddingLeft:"25px", fontWeight:"500"}}>On Parade <br/>Participants</p>  
                   <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.onPerad}</h1>               
                 </div>
               </Grid>
               <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#DAC0A3"}}>
-                <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
+                <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}} onClick={handleClickOpenNotOnParadeList}>
                   <p style={{paddingLeft:"25px", fontWeight:"500"}}>Not on Parade<br/>Participants</p>  
                   <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.notOnPerad}</h1>               
                 </div>
@@ -191,93 +253,115 @@ function Udc() {
             </Grid>
           </Box>
 
-
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <Box sx={{minWidth:800, py:4, pl:4}}>
-              <div style={{marginBottom:"20px"}}>
-                <p style={{fontSize:"20px", fontWeight:"600", margin:"0"}}>Update Participation</p>
-              </div>
-
-              <div style={{display:"flex", flexDirection:"column"}}>
-                <p style={{fontWeight:"500"}}>SVC</p>
-                <TextField fullWidth label="Enter SVC number" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"10px"}} name="svcNo" onChange={handleChange}/>
-
-                <p style={{fontWeight:"500"}}>Platoon</p>
-                <FormControl sx={{ maxWidth:350, marginBottom:"10px" }}>
-                  <Select
-                    displayEmpty
-                    inputProps={{ 'aria-label': 'Without label' }}
-                    onChange={handleChange}
-                    name="platoon"
-                  >
-                    <MenuItem defaultValue={"Alpha"}>Alpha</MenuItem>
-                    <MenuItem value={"Beta"}>Beta</MenuItem>
-                    <MenuItem value={"Cobra"}>Cobra</MenuItem>
-                    <MenuItem value={"Delta"}>Delta</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <p style={{fontWeight:"500"}}>Intake</p>
-                <TextField fullWidth label="Enter Intake" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"20px"}} name="intake" onChange={handleChange}/>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <Box sx={{minWidth:800, py:4, pl:4}}>
+                <div style={{marginBottom:"20px"}}>
+                  <p style={{fontSize:"20px", fontWeight:"600", margin:"0"}}>Update Participation</p>
+                </div>
 
                 <div style={{display:"flex", flexDirection:"column"}}>
-                    <div style={{marginRight:"200px", marginBottom:"10px"}}>
-                        <p style={{fontWeight:"600", margin:"0"}}>Parade Participation *</p>
-                    </div>
+                  <p style={{fontWeight:"500"}}>SVC</p>
+                  <TextField fullWidth label="Enter SVC number" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"10px"}} name="svcNo" onChange={handleChange}/>
 
-                    <div style={{display:"flex", flexDirection:"column"}}>
-                    <FormControl sx={{marginBottom:2}}>
-                        <RadioGroup
-                            aria-labelledby="demo-radio-buttons-group-label"
-                            defaultValue="OnParade"
-                            name="radio-buttons-group"
-                            onChange={handleRadioChange}
-                        >
-                            <FormControlLabel value="OnParade" control={<Radio />} label="Participated" />
-                            <FormControlLabel value="NotOnParade" control={<Radio />} label="Not participated" />
-                        </RadioGroup>
-                    </FormControl>
+                  <p style={{fontWeight:"500"}}>Platoon</p>
+                  <FormControl sx={{ maxWidth:350, marginBottom:"10px" }}>
+                    <Select
+                      displayEmpty
+                      inputProps={{ 'aria-label': 'Without label' }}
+                      onChange={handleChange}
+                      name="platoon"
+                    >
+                      <MenuItem defaultValue={"Alpha"}>Alpha</MenuItem>
+                      <MenuItem value={"Beta"}>Beta</MenuItem>
+                      <MenuItem value={"Cobra"}>Cobra</MenuItem>
+                      <MenuItem value={"Delta"}>Delta</MenuItem>
+                    </Select>
+                  </FormControl>
 
-                    {showSelect && (
-                        <FormControl sx={{marginBottom:2}}>
-                            <InputLabel id="demo-pselect-small-label">Reason</InputLabel>
-                            <Select
-                                labelId="demo-select-small-label"
-                                id="demo-select-small"
-                                value={reason}
-                                label="Reason"
-                                onChange={handleReasonChange}
-                                sx={{ maxWidth:450 }}
-                            >
-                                <MenuItem value={'New report Sick'}>New report Sick</MenuItem>                   
-                                <MenuItem value={'Report Sick'}>Report Sick</MenuItem>
-                                <MenuItem value={'EX PT/EX PARADE'}>EX PT/EX PARADE</MenuItem>
-                                <MenuItem value={'Hospital'}>Hospital</MenuItem>
-                                <MenuItem value={'M1 Room'}>M1 Room</MenuItem>
-                                <MenuItem value={'SD/LD'}>SD/LD</MenuItem>
-                                <MenuItem value={'Leave'}>Leave</MenuItem>
-                                <MenuItem value={'Medicle Leave'}>Medicle Leave</MenuItem>
-                                <MenuItem value={'Workout'}>Workout</MenuItem>
-                                <MenuItem value={'Theory/Practicle'}>Theory/Practicle</MenuItem>
-                                <MenuItem value={'Sports'}>Sports</MenuItem>
-                                <MenuItem value={'Other'}>Other</MenuItem>
-                            </Select>
-                        </FormControl>
-                    )}
+                  <p style={{fontWeight:"500"}}>Intake</p>
+                  <TextField fullWidth label="Enter Intake" id="fullWidth" sx={{maxWidth:350 ,marginBottom:"20px"}} name="intake" onChange={handleChange}/>
 
-                    <Button variant="contained" sx={{maxWidth:150, backgroundColor:"#C68D4D"}} onClick={handleSubmit}>
-                        Submit
-                    </Button>
-                    </div>
+                  <div style={{display:"flex", flexDirection:"column"}}>
+                      <div style={{marginRight:"200px", marginBottom:"10px"}}>
+                          <p style={{fontWeight:"600", margin:"0"}}>Parade Participation *</p>
+                      </div>
+
+                      <div style={{display:"flex", flexDirection:"column"}}>
+                      <FormControl sx={{marginBottom:2}}>
+                          <RadioGroup
+                              aria-labelledby="demo-radio-buttons-group-label"
+                              defaultValue="OnParade"
+                              name="radio-buttons-group"
+                              onChange={handleRadioChange}
+                          >
+                              <FormControlLabel value="OnParade" control={<Radio />} label="Participated" />
+                              <FormControlLabel value="NotOnParade" control={<Radio />} label="Not participated" />
+                          </RadioGroup>
+                      </FormControl>
+
+                      {showSelect && (
+                          <FormControl sx={{marginBottom:2}}>
+                              <InputLabel id="demo-pselect-small-label">Reason</InputLabel>
+                              <Select
+                                  labelId="demo-select-small-label"
+                                  id="demo-select-small"
+                                  value={reason}
+                                  label="Reason"
+                                  onChange={handleReasonChange}
+                                  sx={{ maxWidth:450 }}
+                              >
+                                  <MenuItem value={'New report Sick'}>New report Sick</MenuItem>                   
+                                  <MenuItem value={'Report Sick'}>Report Sick</MenuItem>
+                                  <MenuItem value={'EX PT/EX PARADE'}>EX PT/EX PARADE</MenuItem>
+                                  <MenuItem value={'Hospital'}>Hospital</MenuItem>
+                                  <MenuItem value={'M1 Room'}>M1 Room</MenuItem>
+                                  <MenuItem value={'SD/LD'}>SD/LD</MenuItem>
+                                  <MenuItem value={'Leave'}>Leave</MenuItem>
+                                  <MenuItem value={'Medicle Leave'}>Medicle Leave</MenuItem>
+                                  <MenuItem value={'Workout'}>Workout</MenuItem>
+                                  <MenuItem value={'Theory/Practicle'}>Theory/Practicle</MenuItem>
+                                  <MenuItem value={'Sports'}>Sports</MenuItem>
+                                  <MenuItem value={'Other'}>Other</MenuItem>
+                              </Select>
+                          </FormControl>
+                      )}
+
+                      <Button variant="contained" sx={{maxWidth:150, backgroundColor:"#C68D4D"}} onClick={handleSubmit}>
+                          Submit
+                      </Button>
+                      </div>
+                  </div>
                 </div>
-              </div>
-          </Box>
-        </Dialog>
+            </Box>
+          </Dialog>
+
+          {showOnParade &&(
+            <ParticipantTable 
+              open={openOnParadeList} 
+              title={'On Parade Participation'} 
+              handleClose={handleCloseOnParadeList}
+              list={attendedUsers}
+              />
+          )}
+
+          {showNotOnParade &&(
+            <ParticipantTable 
+              open={openNotOnParadeList} 
+              title={'Not on Parade Participation'} 
+              handleClose={handleCloseNotOnParadeList} 
+              showReason={true}
+              list={notAttendedUsers.map((user, index) => ({
+                ...user,
+                reason: notAttendedReasons[index]?.reason
+              }))}
+            />
+          )}
+
     </div>
   )
 }

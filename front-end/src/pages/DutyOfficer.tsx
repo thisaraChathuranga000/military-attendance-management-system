@@ -3,16 +3,39 @@ import { RootState } from '../redux/store';
 import { setSelectedDate } from '../redux/slice/dateSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Grid } from '@mui/material';
+import ParticipantTable from '../component/ParticipantTable';
+import { listProps } from '../component/ParticipantTable';
 
 function DutyOfficer() {
-  const [attendanceStats, setAttendanceStats] = useState({
-    onPerad: 0,
-    notOnPerad: 0,
-    absent: 0,
-    total: 0
-});
     const selectedDate = useSelector((state: RootState) => state.date.selectedDate);
     const dispatch = useDispatch();
+    const [openOnParadeList, setOpenOnParadeList] = useState<boolean>(false);
+    const [showOnParade, setShowOnParade] = useState<boolean>(false);
+    const [openNotOnParadeList, setOpenNotOnParadeList] = useState<boolean>(false);
+    const [showNotOnParade, setShowNotOnParade] = useState<boolean>(false);
+    const [attendedUsers, setAttendedUsers] = useState<listProps[]>([]);
+    const [notAttendedUsers, setNotAttendedUsers] = useState<listProps[]>([]);
+    const [notAttendedReasons, setNotAttendedReasons] = useState<any[]>([]);
+
+    const handleClickOpenOnParadeList = () => {
+      setOpenOnParadeList(true);
+      setShowOnParade(true);
+    };
+    const handleCloseOnParadeList = () => {setOpenOnParadeList(false)};
+
+    const handleClickOpenNotOnParadeList = () => {
+      setOpenNotOnParadeList(true);
+      setShowNotOnParade(true);
+    }
+    const handleCloseNotOnParadeList = () => {setOpenNotOnParadeList(false)};
+    
+
+    const [attendanceStats, setAttendanceStats] = useState({
+      onPerad: 0,
+      notOnPerad: 0,
+      absent: 0,
+      total: 0
+    });
 
     const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(setSelectedDate(event.target.value));
@@ -20,26 +43,65 @@ function DutyOfficer() {
     };
 
     const fetchData = async (date: string) => {
+        try {
+            const response = await fetch(`http://localhost:5000/attendance/stats/${date}`);
+            if (response.ok) {
+                const data = await response.json();
+                setAttendanceStats(data);
+            } else {
+                console.error('Failed to fetch attendance stats');
+            }
+        } catch (error) {
+            console.error('Error fetching attendance stats:', error);
+        }
+    };
+
+    const fetchAttendedUserData = async (date:string) => {
       try {
-          const response = await fetch(`http://localhost:5000/attendance/stats/${date}`);
+          const response = await fetch(`http://localhost:5000/attendance/attended-users/${date}`);
           if (response.ok) {
               const data = await response.json();
-              setAttendanceStats(data);
+              setAttendedUsers(data);
           } else {
-              console.error('Failed to fetch attendance stats');
+              console.error('Failed to fetch attended users data');
           }
       } catch (error) {
-          console.error('Error fetching attendance stats:', error);
+          console.error('Error fetching attended users data:', error);
       }
-  };
-  
-  useEffect(() => {
-    fetchData(selectedDate);
-  }, [selectedDate]);
+    };
 
-  const handleLogOut = () => {
-    window.location.replace('http://localhost:3000/sign-in')
-  };
+    const fetchNotAttendedUserData = async (date:string) => {
+      try {
+          const usersResponse = await fetch(`http://localhost:5000/attendance/not-attended-users/${date}`);
+          if (usersResponse.ok) {
+              const usersData = await usersResponse.json();
+              setNotAttendedUsers(usersData);
+          } else {
+              console.error('Failed to fetch not attended users data');
+          }
+
+          const reasonsResponse = await fetch(`http://localhost:5000/attendance/not-attended-users/reason/${date}`);
+          if (reasonsResponse.ok) {
+              const reasonsData = await reasonsResponse.json();
+              setNotAttendedReasons(reasonsData);
+          } else {
+              console.error('Failed to fetch not attended reasons data');
+          }
+      } catch (error) {
+          console.error('Error fetching data:', error);
+      }
+    };
+
+    useEffect(() => {
+      fetchData(selectedDate)
+      fetchAttendedUserData(selectedDate)
+      fetchNotAttendedUserData(selectedDate)
+    }, [selectedDate]);
+
+    const handleLogOut = () => {
+      window.location.replace('http://localhost:3000/sign-in')
+    };
+    
   return (
     <div>
           <Box>
@@ -86,18 +148,21 @@ function DutyOfficer() {
                   <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.total}</h1>               
                 </div>
               </Grid>
-              <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#EADBC8"}}>
+
+              <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#EADBC8"}} onClick={handleClickOpenOnParadeList}>
                 <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
                   <p style={{paddingLeft:"25px", fontWeight:"500"}}>On Parade <br/>Participants</p>  
                   <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.onPerad}</h1>               
                 </div>
               </Grid>
-              <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#DAC0A3"}}>
+
+              <Grid item lg={3} xs={6} md={4} sx={{backgroundColor:"#DAC0A3"}} onClick={handleClickOpenNotOnParadeList}>
                 <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
                   <p style={{paddingLeft:"25px", fontWeight:"500"}}>Not on Parade<br/>Participants</p>  
                   <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.notOnPerad}</h1>               
                 </div>
               </Grid>
+
               <Grid item lg={3} xs={6} md={8} sx={{backgroundColor:"#EADBC8"}}>
                 <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
                   <p style={{paddingLeft:"25px", fontWeight:"500"}}>Non Responded <br/>Participants</p>  
@@ -106,6 +171,28 @@ function DutyOfficer() {
               </Grid>
             </Grid>
           </Box>
+
+          {showOnParade &&(
+            <ParticipantTable 
+              open={openOnParadeList} 
+              title={'On Parade Participation'} 
+              handleClose={handleCloseOnParadeList}
+              list={attendedUsers}
+              />
+          )}
+
+          {showNotOnParade &&(
+            <ParticipantTable 
+              open={openNotOnParadeList} 
+              title={'Not on Parade Participation'} 
+              handleClose={handleCloseNotOnParadeList} 
+              showReason={true}
+              list={notAttendedUsers.map((user, index) => ({
+                ...user,
+                reason: notAttendedReasons[index]?.reason
+              }))}
+            />
+          )}
     </div>
   )
 }
