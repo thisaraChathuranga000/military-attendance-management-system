@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, Grid } from '@mui/material';
 import ParticipantTable from '../component/ParticipantTable';
 import { listProps } from '../component/ParticipantTable';
+import AbsentParticipantTable, { AbsentAttendedParticipantListProps, AbsentNotAttendedParticipantListProps } from '../component/AbsentParticipantTable';
+
 
 function Uuo() {
     
@@ -17,6 +19,12 @@ function Uuo() {
     const [attendedUsers, setAttendedUsers] = useState<listProps[]>([]);
     const [notAttendedUsers, setNotAttendedUsers] = useState<listProps[]>([]);
     const [notAttendedReasons, setNotAttendedReasons] = useState<any[]>([]);
+    const [showAbsentUsers, setShowAbsentUsers] = useState<boolean>(false);
+    const [openAbsentUsersList, setOpenAbsentUsersList] = useState<boolean>(false);
+    const [absentAttendedUsers, setAbsentAttendedUsers] = useState<AbsentAttendedParticipantListProps[]>([]);
+    const [absentNotAttendedUsers, setAbsentNotAttendedUsers] = useState<AbsentNotAttendedParticipantListProps[]>([]);
+    const [absentNotAttendedReasons, setAbsentNotAttendedReasons] = useState<any[]>([]);
+    
 
     const handleClickOpenOnParadeList = () => {
       setOpenOnParadeList(true);
@@ -29,6 +37,13 @@ function Uuo() {
       setShowNotOnParade(true);
     }
     const handleCloseNotOnParadeList = () => {setOpenNotOnParadeList(false)};
+
+    const handleClickOpenAbsentList = () => {
+      setOpenAbsentUsersList(true);
+      setShowAbsentUsers(true);
+    }
+
+    const handleClickNotOpenAbsentList = () => {setOpenAbsentUsersList(false)};
 
     const [attendanceStats, setAttendanceStats] = useState({
       onPerad: 0,
@@ -92,10 +107,48 @@ function Uuo() {
       }
     };
 
+    const fetchAbsentAttendedUserData = async (date:string) => {
+      try {
+          const response = await fetch(`http://localhost:5000/attendance/absent/attended-users/${date}`);
+          if (response.ok) {
+              const data = await response.json();
+              setAbsentAttendedUsers(data);
+          } else {
+              console.error('Failed to fetch attended users data');
+          }
+      } catch (error) {
+          console.error('Error fetching attended users data:', error);
+      }
+    };
+
+    const fetchAbsentNotAttendedUserData = async (date:string) => {
+      try {
+          const usersResponse = await fetch(`http://localhost:5000/attendance/absent/not-attended-users/${date}`);
+          if (usersResponse.ok) {
+              const usersData = await usersResponse.json();
+              setAbsentNotAttendedUsers(usersData);
+          } else {
+              console.error('Failed to fetch not attended users data');
+          }
+
+          const reasonsResponse = await fetch(`http://localhost:5000/attendance/absent/not-attended-users/reason/${date}`);
+          if (reasonsResponse.ok) {
+              const reasonsData = await reasonsResponse.json();
+              setAbsentNotAttendedReasons(reasonsData);
+          } else {
+              console.error('Failed to fetch not attended reasons data');
+          }
+      } catch (error) {
+          console.error('Error fetching data:', error);
+      }
+    };
+
     useEffect(() => {
         fetchData(selectedDate);
-        fetchAttendedUserData(selectedDate)
-        fetchNotAttendedUserData(selectedDate)
+        fetchAttendedUserData(selectedDate);
+        fetchNotAttendedUserData(selectedDate);
+        fetchAbsentAttendedUserData(selectedDate);
+        fetchAbsentNotAttendedUserData(selectedDate);
     }, [selectedDate]);
 
     const handleLogOut = () => {
@@ -160,7 +213,7 @@ function Uuo() {
                   <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.notOnPerad}</h1>               
                 </div>
               </Grid>
-              <Grid item lg={3} xs={6} md={8} sx={{backgroundColor:"#EADBC8"}}>
+              <Grid item lg={3} xs={6} md={8} sx={{backgroundColor:"#EADBC8"}} onClick={handleClickOpenAbsentList}>
                 <div style={{ display:"flex", flexDirection:"row", alignItems:"center"}}>
                   <p style={{paddingLeft:"25px", fontWeight:"500"}}>Non Responded <br/>Participants</p>  
                   <h1 style={{paddingLeft:"35px", color:"#C68D4D", fontSize:"46px"}}>{attendanceStats.absent}</h1>               
@@ -189,6 +242,19 @@ function Uuo() {
                 reason: notAttendedReasons[index]?.reason
               }))}
             />
+          )}
+
+          {showAbsentUsers && (
+            <AbsentParticipantTable 
+              open={openAbsentUsersList} 
+              handleClose={handleClickNotOpenAbsentList} 
+              attendedList={absentAttendedUsers}
+              notAttendedList={absentNotAttendedUsers.map((user, index) => ({
+                ...user,
+                reason: absentNotAttendedReasons[index]?.reason
+              }))}
+              showReason={true}
+              />
           )}
         </div>
     );
