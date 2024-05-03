@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { RootState } from '../redux/store';
 import { setSelectedDate } from '../redux/slice/dateSlice';
 import { useDispatch, useSelector } from 'react-redux';
