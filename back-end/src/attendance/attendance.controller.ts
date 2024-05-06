@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param, Query} from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Query, Put} from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/attendance.dto';
 import { Attendance } from 'src/typeorm/entities/Attendance.entity';
@@ -55,6 +55,15 @@ export class AttendanceController {
     @Get('absent/not-attended-users/reason/:date')
     async getAbsentNotAttendedUsersReason(@Param('date') date: string): Promise<{ userId: number; reason: String }[]> {
       return this.attendanceService.getAbsentNotAttendedUsersReason(date);
+    }
+
+    @Put('update/:userId/:date')
+    async updateAttendance(
+      @Param('userId') userId: number,
+      @Param('date') date: string,
+      @Body() updateAttendanceDto: CreateAttendanceDto,
+    ): Promise<Attendance> {
+      return this.attendanceService.updateAttendance(userId, date, updateAttendanceDto);
     }
 
 }

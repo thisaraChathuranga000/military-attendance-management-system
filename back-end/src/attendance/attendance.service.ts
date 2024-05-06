@@ -15,8 +15,14 @@ export class AttendanceService {
     ) {}
 
     async createAttendance(createAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
-        const user = this.attendanceRepository.create(createAttendanceDto);
-        return await this.attendanceRepository.save(user);
+      const existingAttendance = await this.attendanceRepository.findOne({ where: { userId: createAttendanceDto.userId, date: createAttendanceDto.date } });
+  
+      if (existingAttendance) {
+          throw new Error(`Attendance record already exists for user ${createAttendanceDto.userId} on date ${createAttendanceDto.date}`);
+      }
+  
+      const attendance = this.attendanceRepository.create(createAttendanceDto);
+      return await this.attendanceRepository.save(attendance);
     }
 
     async findOne(id: number): Promise<Attendance> {
@@ -137,4 +143,15 @@ export class AttendanceService {
 
     return absentNotAttendedUsersReason.map(({ userId, reason }) => ({ userId, reason }));
   }
+
+  async updateAttendance(userId: number, date: string, updateAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
+    const existingAttendance = await this.attendanceRepository.findOne({ where: { userId, date } });
+
+    if (!existingAttendance) {
+      throw new Error(`Attendance record not found for user ${userId} on date ${date}`);
+    }
+
+    Object.assign(existingAttendance, updateAttendanceDto);
+    return this.attendanceRepository.save(existingAttendance);
+}
 }
