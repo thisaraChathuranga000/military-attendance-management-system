@@ -11,6 +11,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Box, Button, FormHelperText, Grid } from '@mui/material';
+import { logout } from '../redux/slice/authSlice';
 
 function Soldier() {
     const selectedDate = useSelector((state: RootState) => state.date.selectedDate);
@@ -52,9 +53,9 @@ function Soldier() {
             });
 
             if (response.ok) {
-                console.log('Attendance submitted successfully');
+                alert('Attendance submitted successfully');
             } else {
-                console.error('Failed to submit attendance');
+                alert('Failed to submit attendance');
             }
         } catch (error) {
             console.error('Error submitting attendance:', error);
@@ -65,6 +66,7 @@ function Soldier() {
 
     const handleLogOut = () => {
         window.location.replace('http://localhost:3000/sign-in')
+        dispatch(logout())
     };
 
     return (

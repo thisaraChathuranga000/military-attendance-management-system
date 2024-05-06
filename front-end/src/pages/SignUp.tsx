@@ -1,7 +1,10 @@
 import { Box, Button, FormControl, Grid, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
+import { logout } from '../redux/slice/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 function SignUp() {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     userName: '',
     password: '',
@@ -62,6 +65,7 @@ function SignUp() {
 
       if (response.ok) {
         window.location.replace('http://localhost:3000/sign-in')
+        dispatch(logout())
       } else {
         console.error('Failed to sign up:', response.statusText);
       }
@@ -72,12 +76,13 @@ function SignUp() {
 
   const handleSignIn = () => {
     window.location.replace('http://localhost:3000/sign-in')
+    dispatch(logout())
   };
 
   return (
     <div>
       <Box>
-      <Grid container>
+      <Grid container style={{ height: '100vh' }}>
       <Grid  item lg={6} md={6} xs={12} container sx={{pl:10, pt:5, display:"flex", flexDirection:"column", }}>
           <div style={{display:"flex",alignItems:"center", }}>
             <img src="assets/images/logo.png" alt="" />

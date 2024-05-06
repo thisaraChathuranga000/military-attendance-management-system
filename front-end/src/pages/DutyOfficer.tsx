@@ -6,6 +6,7 @@ import { Box, Grid } from '@mui/material';
 import ParticipantTable from '../component/ParticipantTable';
 import { listProps } from '../component/ParticipantTable';
 import AbsentParticipantTable, { AbsentAttendedParticipantListProps, AbsentNotAttendedParticipantListProps } from '../component/AbsentParticipantTable';
+import { logout } from '../redux/slice/authSlice';
 
 function DutyOfficer() {
     const selectedDate = useSelector((state: RootState) => state.date.selectedDate);
@@ -152,6 +153,7 @@ function DutyOfficer() {
 
     const handleLogOut = () => {
       window.location.replace('http://localhost:3000/sign-in')
+      dispatch(logout())
     };
     
   return (

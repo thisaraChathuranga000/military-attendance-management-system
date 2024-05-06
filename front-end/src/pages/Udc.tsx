@@ -7,6 +7,7 @@ import { Box, Button, FormControl,  FormControlLabel, Grid, InputLabel, MenuItem
 import ParticipantTable from '../component/ParticipantTable';
 import { listProps } from '../component/ParticipantTable';
 import AbsentParticipantTable, { AbsentAttendedParticipantListProps, AbsentNotAttendedParticipantListProps } from '../component/AbsentParticipantTable';
+import { logout } from '../redux/slice/authSlice';
 
 function Udc() {
   const selectedDate = useSelector((state: RootState) => state.date.selectedDate);
@@ -95,8 +96,8 @@ function Udc() {
 
   const handleSubmit = async () => {
     try {
-        const response = await fetch('http://localhost:5000/attendance', {
-            method: 'POST',
+        const response = await fetch(`http://localhost:5000/attendance/update/${selectedUserId}/${selectedDate}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -104,16 +105,14 @@ function Udc() {
                 onPerad: onParade,  
                 notOnPerad: !onParade,
                 reason,
-                date: selectedDate,
-                userId: selectedUserId,
                 absent:true
             }),
         });
 
         if (response.ok) {
-            console.log('Attendance submitted successfully');
+            alert('Attendance updated successfully');
         } else {
-            console.error('Failed to submit attendance');
+            alert('Failed to update attendance');
         }
     } catch (error) {
         console.error('Error submitting attendance:', error);
@@ -210,12 +209,12 @@ function Udc() {
 
   const handleLogOut = () => {
     window.location.replace('http://localhost:3000/sign-in')
+    dispatch(logout())
   };
 
   const handleReasonChange = (event: SelectChangeEvent) => {
     setReason(event.target.value);
   };
-
   
   return (
     <div>

@@ -77,10 +77,10 @@ function SignIn() {
     <div>
       
 
-      <Box >
-      <Grid container>
+      <Box>
+      <Grid container style={{ height: '100vh' }}>
         <Grid  item lg={6} md={6} xs={12} container sx={{pl:10, pt:5, display:"flex", flexDirection:"column", }}>
-          <div style={{display:"flex",alignItems:"center"}}>
+          <div style={{display:"flex",alignItems:"center"}} id="image">
             <img src="assets/images/logo.png" alt="" />
             <Typography variant="h5" component="div">
               Military Connect
