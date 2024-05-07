@@ -220,7 +220,7 @@ function Udc() {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
-            <Box sx={{minWidth:800, py:4, pl:4}}>
+            <Box sx={{py:4, pl:4 , pr:2}}>
                 <div style={{marginBottom:"20px"}}>
                   <p style={{fontSize:"20px", fontWeight:"600", margin:"0"}}>Update Participation</p>
                 </div>

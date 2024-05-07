@@ -23,7 +23,7 @@ function ParticipantTable({open, title, showReason, handleClose, list}:Participa
                 open={open}
                 onClose={handleClose}
             >
-                <Box sx={{minWidth:800, py:4, pl:4}}>
+                <Box sx={{ py:4, pl:4, pr:4}}>
                     <div>
                         <p style={{fontSize:"20px", fontWeight:"600", margin:"0"}}>{title}</p>
                     </div>
