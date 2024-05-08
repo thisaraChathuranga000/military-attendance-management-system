@@ -64,7 +64,7 @@ function SignUp() {
       });
 
       if (response.ok) {
-        window.location.replace('http://localhost:3000/sign-in')
+        window.location.replace('http://localhost:3000')
         dispatch(logout())
       } else {
         console.error('Failed to sign up:', response.statusText);
@@ -75,7 +75,7 @@ function SignUp() {
   };
 
   const handleSignIn = () => {
-    window.location.replace('http://localhost:3000/sign-in')
+    window.location.replace('http://localhost:3000')
     dispatch(logout())
   };
 

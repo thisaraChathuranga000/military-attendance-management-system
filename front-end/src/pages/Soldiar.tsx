@@ -65,7 +65,7 @@ function Soldier() {
     };
 
     const handleLogOut = () => {
-        window.location.replace('http://localhost:3000/sign-in')
+        window.location.replace('http://localhost:3000')
         dispatch(logout())
     };
 
