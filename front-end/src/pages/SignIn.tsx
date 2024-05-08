@@ -75,8 +75,6 @@ function SignIn() {
 
   return (
     <div>
-      
-
       <Box>
       <Grid container style={{ height: '100vh' }}>
         <Grid  item lg={6} md={6} xs={12} container sx={{pl:10, pt:5, display:"flex", flexDirection:"column", }}>
@@ -101,7 +99,6 @@ function SignIn() {
                 inputProps={{ 'aria-label': 'Without label' }}
                 onChange={handleRankChange}
               >
-                
                 <MenuItem value={"Soldier"}>Soldier</MenuItem>
                 <MenuItem value={"UUO"}>UUO</MenuItem>
                 <MenuItem value={"Duty Officer"}>Duty Officer</MenuItem>
