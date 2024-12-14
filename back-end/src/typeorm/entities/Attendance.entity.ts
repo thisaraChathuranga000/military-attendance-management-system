@@ -22,4 +22,7 @@ export class Attendance {
 
     @Column()
     userId: number;
+
+    @Column({default: null})
+    image: String;
 }

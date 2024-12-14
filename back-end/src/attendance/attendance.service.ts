@@ -25,6 +25,8 @@ export class AttendanceService {
       return await this.attendanceRepository.save(attendance);
     }
 
+
+
     async findOne(id: number): Promise<Attendance> {
         const user = await this.attendanceRepository.findOne({ where: { id }});
         if (!user) {
@@ -97,10 +99,10 @@ export class AttendanceService {
     async getNotAttendedUsersReason(date: string): Promise<{ userId: number; reason: String }[]> {
       const notAttendedUsers = await this.attendanceRepository.find({
         where: { notOnPerad: true, date },
-        select: ['userId', 'reason'],
+        select: ['userId', 'reason', 'image'],
       });
   
-      return notAttendedUsers.map(({ userId, reason }) => ({ userId, reason }));
+      return notAttendedUsers.map(({ userId, reason, image }) => ({ userId, reason, image }));
     }
 
     async getAbsentAttendedUsers(date: string): Promise<{ userName: string; svcNo: string }[]> {
@@ -129,7 +131,7 @@ export class AttendanceService {
 
     const absentNotAttendedUsers = await this.userRepository.find({
       where: { id: In(absentNotAttendedUserIds) },
-      select: ['name', 'svcNo'],
+      select: ['name', 'svcNo',],
     });
 
     return absentNotAttendedUsers;
@@ -138,10 +140,10 @@ export class AttendanceService {
   async getAbsentNotAttendedUsersReason(date: string): Promise<{ userId: number; reason: String }[]> {
     const absentNotAttendedUsersReason = await this.attendanceRepository.find({
       where: { notOnPerad: true, absent: true, date },
-      select: ['userId', 'reason'],
+      select: ['userId', 'reason', 'image'],
     });
 
-    return absentNotAttendedUsersReason.map(({ userId, reason }) => ({ userId, reason }));
+    return absentNotAttendedUsersReason.map(({ userId, reason, image }) => ({ userId, reason, image }));
   }
 
   async updateAttendance(userId: number, date: string, updateAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
@@ -153,5 +155,18 @@ export class AttendanceService {
 
     Object.assign(existingAttendance, updateAttendanceDto);
     return this.attendanceRepository.save(existingAttendance);
+}
+
+async findUserIdBySVCPlatoonIntake(svcNo: string, platoon: string, intake: string): Promise<User> {
+  const user = await this.userRepository.findOne({
+    where: { svcNo, platoon, intake },
+    select: ['id'],  
+  });
+
+  if (!user) {
+    throw new NotFoundException(`User with SVC No: ${svcNo}, Platoon: ${platoon}, and Intake: ${intake} not found.`);
+  }
+
+  return user;  
 }
 }
