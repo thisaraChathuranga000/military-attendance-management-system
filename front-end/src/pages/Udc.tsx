@@ -112,7 +112,7 @@ function Udc() {
       formData.append("reason", reason);
       formData.append("date", selectedDate);
       formData.append("userId", selectedUserId.toString());
-      formData.append("absent", "false");
+      formData.append("absent", "true");
 
       if (image) {
         formData.append("file", image);
@@ -142,7 +142,7 @@ function Udc() {
       formData.append("reason", reason);
       formData.append("date", selectedDate);
       formData.append("userId", selectedUserId.toString());
-      formData.append("absent", "false");
+      formData.append("absent", "true");
 
       if (updatedImage) {
         formData.append("file", updatedImage);

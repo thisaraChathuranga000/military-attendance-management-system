@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Param } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException, Param } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Attendance } from "src/typeorm/entities/Attendance.entity";
 import { In, Repository } from "typeorm";
@@ -14,11 +14,33 @@ export class AttendanceService {
         private readonly userRepository: Repository<User>,
     ) {}
 
+    // async createAttendance(createAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
+    //   const existingAttendance = await this.attendanceRepository.findOne({ where: { userId: createAttendanceDto.userId, date: createAttendanceDto.date } });
+  
+    //   if (existingAttendance) {
+    //       throw new Error(`Attendance record already exists for user ${createAttendanceDto.userId} on date ${createAttendanceDto.date}`);
+    //   }
+  
+    //   const attendance = this.attendanceRepository.create(createAttendanceDto);
+    //   return await this.attendanceRepository.save(attendance);
+    // }
+
     async createAttendance(createAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
-      const existingAttendance = await this.attendanceRepository.findOne({ where: { userId: createAttendanceDto.userId, date: createAttendanceDto.date } });
+      const existingAttendance = await this.attendanceRepository.findOne({
+        where: {
+          userId: createAttendanceDto.userId,
+          date: createAttendanceDto.date,
+        },
+      });
   
       if (existingAttendance) {
-          throw new Error(`Attendance record already exists for user ${createAttendanceDto.userId} on date ${createAttendanceDto.date}`);
+        throw new HttpException(
+          {
+            status: HttpStatus.CONFLICT,
+            error: `Attendance record already exists for user ${createAttendanceDto.userId} on date ${createAttendanceDto.date}`,
+          },
+          HttpStatus.CONFLICT,
+        );
       }
   
       const attendance = this.attendanceRepository.create(createAttendanceDto);

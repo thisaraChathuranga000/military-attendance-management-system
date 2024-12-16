@@ -69,7 +69,11 @@ function Soldier() {
 
       if (response.ok) {
         alert("Attendance submitted successfully");
-      } else {
+      } else if(response.status === 409){
+        alert(`attendance already exists for ${selectedDate}`)
+
+      }
+      else {
         alert("Failed to submit attendance");
       }
     } catch (error) {

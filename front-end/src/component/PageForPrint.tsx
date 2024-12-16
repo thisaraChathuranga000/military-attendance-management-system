@@ -42,16 +42,42 @@ function PageForPrint({
 }: PageForPrint) {
   const printRef = useRef<HTMLDivElement | HTMLTableElement>(null);
 
+
   const handlePrint = () => {
     if (printRef.current) {
       const printWindow = window.open("", "", "height=800,width=800");
-
+  
       if (printWindow) {
-        printWindow.document.write(
-          "<html><head><title>Print</title></head><body>"
-        );
-        printWindow.document.write(printRef.current.outerHTML);
-        printWindow.document.write("</body></html>");
+        const styles = `
+          <style>
+            body {
+              font-family: Roboto, Arial, sans-serif;
+              margin: 0;
+              padding: 0;
+              margin: 40px
+            }
+            .MuiTableCell-root {
+              padding: 4px;
+              border: none;
+            }
+            .MuiTableRow-root {
+              height: 24px;
+            }
+          </style>
+        `;
+  
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Print</title>
+              ${styles}
+            </head>
+            <body>
+              ${printRef.current.outerHTML}
+            </body>
+          </html>
+        `);
+  
         printWindow.document.close();
         printWindow.print();
       } else {
